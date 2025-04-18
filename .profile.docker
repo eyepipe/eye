@@ -1,0 +1,2 @@
+# source .profile.docker
+alias eye="docker run --rm -i -v "$(pwd):/app" ghcr.io/eyepipe/eye"

@@ -1,0 +1,12 @@
+/*.eye
+/*.pub
+/*.sig
+/*.enc
+/*.dec
+/*.tmp
+db/databases/*.sqlite
+bin/*
+build/*
+config/config.yml
+!*/.keep
+!repository.eye.pub

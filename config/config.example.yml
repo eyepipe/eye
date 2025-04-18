@@ -1,0 +1,20 @@
+# see jwt_token/types.go <HS256, HS384, HS512>
+jwt_algo: HS512
+jwt_iss: eye
+# openssl rand -hex 64 (512 >> 3)
+jwt_secret_hex: 34ebd789a2115834f4b283b37e0718b8bef8004dfbf205679ed22424ed01e1fe775ccdad3e12fcd6f13d17eb7b158fe3dea1b4a2f2781b269c776b319d662904
+
+db_shard_files:
+  - db/databases/db00.sqlite
+  - db/databases/db01.sqlite
+  - db/databases/db02.sqlite
+  - db/databases/db03.sqlite
+  - db/databases/db04.sqlite
+  - db/databases/db05.sqlite
+  - db/databases/db07.sqlite
+  - db/databases/db08.sqlite
+  - db/databases/db09.sqlite
+  - db/databases/db10.sqlite
+
+s3_shard_dsn:
+  - http://s3.example.com?urn=bucker-provider&region=eu&bucket=bucket&accessKey=secret&secretKey=key
