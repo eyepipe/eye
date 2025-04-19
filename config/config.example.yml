@@ -18,3 +18,5 @@ db_shard_files:
 
 s3_shard_dsn:
   - http://s3.example.com?urn=bucker-provider&region=eu&bucket=bucket&accessKey=secret&secretKey=key
+
+server_body_limit_mb: 4

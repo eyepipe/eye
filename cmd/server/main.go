@@ -51,6 +51,7 @@ func main() {
 					app := fiber.New(fiber.Config{
 						StreamRequestBody:            true,
 						DisablePreParseMultipartForm: true,
+						BodyLimit:                    server.config.ServerBodyLimitMiB << 20, // 4 Mb
 					})
 					app.Use(logger.New())
 

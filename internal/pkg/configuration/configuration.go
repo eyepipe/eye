@@ -18,6 +18,9 @@ type Configuration struct {
 
 	// S3
 	S3ShardDSN []string `yaml:"s3_shard_dsn"`
+
+	// Server
+	ServerBodyLimitMiB int `yaml:"server_body_limit_mb"`
 }
 
 func New() *Configuration {

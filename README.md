@@ -3,6 +3,7 @@
 
 > [!WARNING]
 > *eye is currently in beta testing mode*
+> - the current limit for the encrypted message sent to the cloud is 4 MiB.
 
 Eye is a utility for encrypting and digitally signing **files** and **text** messages.
 Unlike existing programs such as [age](https://github.com/FiloSottile/age) or gpg, eye
