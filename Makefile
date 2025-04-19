@@ -32,6 +32,14 @@ build-cli:
 	@echo "============================="
 	@echo "./build/eye-cli-darwin-arm64"
 
+sign-build: EXECUTABLE=build/eye-cli-darwin-arm64
+sign-build:
+	cat build/eye-cli-linux-amd64 | $(EXECUTABLE) sign -i repository.eye > build/eye-cli-linux-amd64.sig
+	cat build/eye-cli-linux-arm64 | $(EXECUTABLE) sign -i repository.eye > build/eye-cli-linux-arm64.sig
+	cat build/eye-cli-windows-amd64.exe | $(EXECUTABLE) sign -i repository.eye > build/eye-cli-windows-amd64.exe.sig
+	cat build/eye-cli-darwin-amd64 | $(EXECUTABLE) sign -i repository.eye > build/eye-cli-darwin-amd64.sig
+	cat build/eye-cli-darwin-arm64 | $(EXECUTABLE) sign -i repository.eye > build/eye-cli-darwin-arm64.sig
+
 # make SIZE="10g" randfile
 randfile: SIZE="1g"
 randfile:
