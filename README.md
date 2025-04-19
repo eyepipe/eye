@@ -254,5 +254,5 @@ encrypting it with the [repository's public key](./repository.eye.pub).
 In the case of a GitHub issue, it might be convenient to encode it in [HEX](#hex-encoding).
 
 ```bash
-echo "New Issue" | eye encrypt -i alice.eye -p https://raw.githubusercontent.com/shlima/eye/refs/heads/master/repository.eye.pub
+echo "New Issue" | eye encrypt -i alice.eye -p https://raw.githubusercontent.com/eyepipe/eye/refs/heads/master/repository.eye.pub
 ```
