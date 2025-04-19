@@ -29,8 +29,8 @@ redirected to another.
 
 ## Installation
 
-Eye is distributed as a single binary file for `Windows`, `macOS`, or `Linux` on
-`amd64` or `arm64` platforms.
+Eye is distributed as a [single binary](https://github.com/eyepipe/eye/releases) 
+file for `Windows`, `macOS`, or `Linux` on `amd64` or `arm64` platforms.
 The executable file can be downloaded from the "Releases" section on GitHub.
 It is also available for execution through a [Docker](#docker) container.
 
@@ -181,13 +181,17 @@ cat README.md.enc | eye decrypt -i bob.eye -p alice.eye.pub --sig-hex 3081870242
 
 Using the eye command-line utility via `Docker` is very simple — you just need to mount
 the current directory and redirect the `stdout` stream to the container's `stdin`.
-Below is an example alias for using eye in Docker: all the examples described in the
-README work fully with this method of running it.
+Below is an example alias for using eye in [Docker](https://github.com/eyepipe/eye/pkgs/container/eye): 
+all the examples described in the README work fully with this method of running it.
 
 > [!WARNING]
 > This kind of usage is not optimal and works significantly slower than directly
 > executing the binary on your host. However, it is perfectly suitable for infrequent
 > use and small volumes of data being transferred.
+
+```bash
+docker pull ghcr.io/eyepipe/eye
+```
 
 ```bash
 alias eye="docker run --rm -i -v "$(pwd):/app" ghcr.io/eyepipe/eye"
