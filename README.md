@@ -186,14 +186,14 @@ the current directory and redirect the `stdout` stream to the container's `stdin
 Below is an example alias for using eye in [Docker](https://github.com/eyepipe/eye/pkgs/container/eye): 
 all the examples described in the README work fully with this method of running it.
 
+```bash
+docker pull ghcr.io/eyepipe/eye
+```
+
 > [!WARNING]
 > This kind of usage is not optimal and works significantly slower than directly
 > executing the binary on your host. However, it is perfectly suitable for infrequent
 > use and small volumes of data being transferred.
-
-```bash
-docker pull ghcr.io/eyepipe/eye
-```
 
 ```bash
 alias eye="docker run --rm -i -v "$(pwd):/app" ghcr.io/eyepipe/eye"
