@@ -241,7 +241,7 @@ echo -n $HEX | eye hex --dec | eye decrypt -i alice.eye -p bob.eye.pub --sig mes
 
 ## Feedback
 
-You can send an encrypted feedback via email or create an [issue](/issues) on GitHub by
+You can send an encrypted feedback via email or create an [issue](https://github.com/eyepipe/eye/issues) on GitHub by
 encrypting it with the [repository's public key](./repository.eye.pub).
 In the case of a GitHub issue, it might be convenient to encode it in [HEX](#hex-encoding).
 
