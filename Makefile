@@ -19,20 +19,18 @@ help:
 	@echo '  make NAME="create_pages" db-create'
 	@echo ' '
 
-PLATFORMS := \
-    linux/amd64 \
-    linux/arm64 \
-    windows/amd64 \
-    darwin/amd64 \
-    darwin/arm64
-
 clean:
 	rm -rf ./$(BUILD_DIR)/*
 
 build-cli: clean
-build-cli: INPUT="cmd/cli/*.go"
 build-cli:
-	@./scripts/build.sh "eye-cli" "$(PLATFORMS)" $(LDFLAGS) $(INPUT)
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/eye-cli-linux-amd64 -ldflags=$(LDFLAGS) cmd/cli/*.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o build/eye-cli-linux-arm64 -ldflags=$(LDFLAGS) cmd/cli/*.go
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/eye-cli-windows-amd64 -ldflags=$(LDFLAGS) cmd/cli/*.go
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o build/eye-cli-darwin-amd64 -ldflags=$(LDFLAGS) cmd/cli/*.go
+	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -o build/eye-cli-darwin-arm64 -ldflags=$(LDFLAGS) cmd/cli/*.go
+	@echo "============================="
+	@echo "./build/eye-cli-darwin-arm64"
 
 # make SIZE="10g" randfile
 randfile: SIZE="1g"
