@@ -1,12 +1,13 @@
 package web
 
 import (
-	"github.com/eyepipe/eye/internal/lib/crypto2"
-	"github.com/eyepipe/eye/internal/lib/s3_cli"
 	"hash"
 
+	"github.com/eyepipe/eye/internal/lib/crypto2"
 	"github.com/eyepipe/eye/internal/lib/jwt_token"
+	"github.com/eyepipe/eye/internal/lib/s3_cli"
 	"github.com/eyepipe/eye/internal/lib/shard"
+	"github.com/eyepipe/eye/internal/pkg/configuration"
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -15,6 +16,7 @@ type Web struct {
 	stores *shard.Shards[IStore]
 	s3     *shard.Shards[s3_cli.ICli]
 	jwt    jwt_token.IToken
+	config *configuration.Configuration
 }
 
 func (w *Web) NewHash() hash.Hash {
@@ -35,4 +37,8 @@ func (w *Web) SetJwtToken(jwt jwt_token.IToken) {
 
 func (w *Web) SetApp(c *fiber.App) {
 	w.app = c
+}
+
+func (w *Web) SetConfig(config *configuration.Configuration) {
+	w.config = config
 }

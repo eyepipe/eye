@@ -24,7 +24,7 @@ func (w *Web) CreateUpload(c fiber.Ctx) error {
 		return fmt.Errorf("invalid signing algo: <%s>", signAlgo.String())
 	}
 
-	reader := c.Request().BodyStream()
+	reader := io.LimitReader(c.Request().BodyStream(), w.config.GetServerBodyLimitBytes())
 	defer func() {
 		_ = c.Request().CloseBodyStream()
 	}()

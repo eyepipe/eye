@@ -37,3 +37,7 @@ func (c *Configuration) BindYAMLFile(filename string) error {
 
 	return nil
 }
+
+func (c *Configuration) GetServerBodyLimitBytes() int64 {
+	return int64(c.ServerBodyLimitMiB) << 20
+}

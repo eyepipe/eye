@@ -51,10 +51,11 @@ func main() {
 					app := fiber.New(fiber.Config{
 						StreamRequestBody:            true,
 						DisablePreParseMultipartForm: true,
-						BodyLimit:                    server.config.ServerBodyLimitMiB << 20, // 4 Mb
 					})
 					app.Use(logger.New())
 
+					w.SetConfig(server.config)
+					w.SetS3(s3Shards)
 					w.SetS3(s3Shards)
 					w.SetStores(storeShards)
 					w.SetJwtToken(jwt)
