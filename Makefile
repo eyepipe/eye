@@ -26,7 +26,7 @@ build-cli: clean
 build-cli:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/eye-cli-linux-amd64 -ldflags=$(LDFLAGS) cmd/cli/*.go
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o build/eye-cli-linux-arm64 -ldflags=$(LDFLAGS) cmd/cli/*.go
-	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/eye-cli-windows-amd64 -ldflags=$(LDFLAGS) cmd/cli/*.go
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/eye-cli-windows-amd64.exe -ldflags=$(LDFLAGS) cmd/cli/*.go
 	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o build/eye-cli-darwin-amd64 -ldflags=$(LDFLAGS) cmd/cli/*.go
 	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -o build/eye-cli-darwin-arm64 -ldflags=$(LDFLAGS) cmd/cli/*.go
 	@echo "============================="
