@@ -4,7 +4,7 @@
 > [!WARNING]
 > *eye is currently in beta testing mode*.
 
-> [!WARNING]
+> [!INFO]
 > The current limit for an encrypted message sent to the **cloud** is 4 MiB, 
 > with a TTL of 7 days.
 
