@@ -37,8 +37,8 @@ and signature algorithms that will be used with this key.
 
 Available defaults:
 
--https://example.com/v1/scheme/super.json
--https://example.com/v1/scheme/high.json
+- https://api.eyepipe.pw/v1/schemes/super.json
+- https://api.eyepipe.pw/v1/schemes/high.json
 
 `,
 }
