@@ -29,8 +29,7 @@ type ContractV1 struct {
 	KeyAgreementAlgoURL  string   `json:"key_agreement_algo_url"`
 	KeyDerivationAlgoURL string   `json:"key_derivation_algo_url"`
 	BlockCipherAlgoURL   string   `json:"block_cipher_algo_url"`
-	CreateUploadURL      string   `json:"create_upload_url"`
-	ConfirmUploadURL     string   `json:"confirm_upload_url"`
+	CreateUploadURLs     []string `json:"create_upload_urls"`
 }
 
 func (c ContractV1) WithHost(host string) ContractV1 {
@@ -41,15 +40,17 @@ func (c ContractV1) WithHost(host string) ContractV1 {
 	c.KeyAgreementAlgoURL = host + c.KeyAgreementAlgoURL
 	c.KeyDerivationAlgoURL = host + c.KeyDerivationAlgoURL
 	c.BlockCipherAlgoURL = host + c.BlockCipherAlgoURL
-	c.CreateUploadURL = host + c.CreateUploadURL
-	c.ConfirmUploadURL = host + c.ConfirmUploadURL
+	c.CreateUploadURLs = lo.Map(c.CreateUploadURLs, func(x string, index int) string {
+		return host + x
+	})
 
 	return c
 }
 
 type CreateUploadResponseV1 struct {
-	Token      string `json:"token"`
-	UploadUUID string `json:"upload_uuid"`
+	Token           string `json:"token"`
+	UploadUUID      string `json:"upload_uuid"`
+	ConfirmationURL string `json:"confirmation_url"`
 }
 
 type ConfirmUploadRequestV1 struct {

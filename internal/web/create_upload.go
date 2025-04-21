@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"encoding/hex"
 	"fmt"
 	"io"
@@ -12,25 +13,31 @@ import (
 	"github.com/eyepipe/eye/internal/lib/size_reader"
 	"github.com/eyepipe/eye/internal/lib/uuidv7"
 	"github.com/eyepipe/eye/internal/pkg/domain"
-	"github.com/eyepipe/eye/internal/pkg/services/export_service"
+	"github.com/eyepipe/eye/internal/pkg/validator"
 	"github.com/eyepipe/eye/pkg/proto"
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/log"
 	"github.com/shlima/oi/null"
 )
 
+// CreateUpload
+//
+//	curl -X POST -H 'x-signer-algo: ECDSA-P521-SHA512' --data @README.md http://localhost:3000/v1/uploads/create
 func (w *Web) CreateUpload(c fiber.Ctx) error {
 	signAlgo := crypto2.SignerAlgo(c.Get("x-signer-algo"))
 	if !signAlgo.IsValid() {
 		return fmt.Errorf("invalid signing algo: <%s>", signAlgo.String())
 	}
 
-	reader := io.LimitReader(c.Request().BodyStream(), w.config.GetServerBodyLimitBytes())
+	// POST without data body
+	if !c.Request().IsBodyStream() {
+		return fmt.Errorf("expected body as a stream chunk")
+	}
+
+	reader := io.LimitReader(c.Request().BodyStream(), w.config.ServerSingleUploadBytesLimit)
 	defer func() {
 		_ = c.Request().CloseBodyStream()
 	}()
-
-	// TODO: ADD VALIDATION ON EMPTY READER
-	// TODO: VALIDATE panic(c.Request().IsBodyStream())
 
 	signer := signAlgo.ToSigner()
 	hashier := signer.GetHashier().New()
@@ -48,12 +55,29 @@ func (w *Web) CreateUpload(c fiber.Ctx) error {
 		SignerAlgo: null.NewAutoString(signAlgo.String()),
 		S3Key:      null.NewAutoString(key),
 		S3Urn:      null.NewAutoString(s3.GetURN()),
-		TTL:        null.NewAutoTime(time.Now().AddDate(0, 0, 7)),
+		TTL:        null.NewAutoTime(w.now().AddDate(0, 0, 7)),
 	}
 	err := store.CreateUpload(c.Context(), upload)
 	if err != nil {
 		return fmt.Errorf("failed to create upload: %w", err)
 	}
+
+	limitation, err := store.FetchLimitation(c.Context(), w.now())
+	if err != nil {
+		return fmt.Errorf("failed to fetch limitation: %w", err)
+	}
+	err = w.validator.ValidateWriteLimit(c.Context(), validator.ValidateWriteLimitOpts{
+		Limitation:        limitation,
+		WriteBytesLimit:   w.config.ServerShardWriteBytesLimit,
+		WriteCounterLimit: w.config.ServerShardWriteCounterLimit,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to validate write limit: %w", err)
+	}
+
+	defer func() {
+		w.incrementWriteLimitationSilent(c.Context(), shard, sizedReader.GetByteSize())
+	}()
 
 	_, err = s3.UploadReadAll(
 		c.Context(),
@@ -79,69 +103,32 @@ func (w *Web) CreateUpload(c fiber.Ctx) error {
 	}
 
 	return c.JSON(proto.CreateUploadResponseV1{
-		Token:      token,
-		UploadUUID: upload.UUID.String,
+		Token:           token,
+		UploadUUID:      upload.UUID.String,
+		ConfirmationURL: c.BaseURL() + proto.SlugV1ConfirmUpload,
 	})
 }
 
-func (w *Web) ConfirmUpload(c fiber.Ctx) error {
-	req := new(proto.ConfirmUploadRequestV1)
-	err := c.Bind().JSON(req)
+func (w *Web) incrementWriteLimitationSilent(ctx context.Context, shard uint16, byteSize int64) {
+	err := w.incrementWriteLimitation(ctx, shard, byteSize)
 	if err != nil {
-		return fmt.Errorf("failed to bind request: %w", err)
+		log.Errorf("failed to increment write limitation: %v", err)
 	}
+}
 
-	jwt, err := w.jwt.DecodeUploadVerificationJWT(req.Token)
-	if err != nil {
-		return fmt.Errorf("failed to decode jwt: %w", err)
-	}
+func (w *Web) incrementWriteLimitation(ctx context.Context, shard uint16, byteSize int64) error {
+	store := w.stores.MustGet(shard)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
+	defer cancel()
 
-	jwtUUID, err := uuidv7.Decode(jwt.UploadUUID)
-	if err != nil {
-		return fmt.Errorf("failed to decode uuid: %w", err)
-	}
-
-	store := w.stores.MustGet(jwtUUID.Shard)
-	upload, err := store.FindUpload(c.Context(), jwtUUID.String())
-	if err != nil {
-		return fmt.Errorf("failed to find upload: %w", err)
-	}
-
-	pubBytes, err := hex.DecodeString(req.PubKeyHex)
-	if err != nil {
-		return fmt.Errorf("failed to decode public key: %w", err)
-	}
-
-	pubKey, err := export_service.SPKIToPublicKey(pubBytes)
-	if err != nil {
-		return fmt.Errorf("failed to import public key: %w", err)
-	}
-
-	sig, err := hex.DecodeString(req.SigHex)
-	if err != nil {
-		return fmt.Errorf("failed to decode sig: %w", err)
-	}
-
-	serverHash, err := hex.DecodeString(jwt.ServerHashHex)
-	if err != nil {
-		return fmt.Errorf("failed to decode serverhash: %w", err)
-	}
-
-	signer := upload.GetSignerAlgo().ToSigner()
-	valid, err := signer.Verify(serverHash, sig, pubKey)
-	switch {
-	case err != nil:
-		return fmt.Errorf("failed to verify signature: %w", err)
-	case !valid:
-		return fmt.Errorf("signature is invalid")
-	}
-
-	err = store.UpdateUploadSignatureHex(c.Context(), jwt.UploadUUID, hex.EncodeToString(sig))
-	if err != nil {
-		return fmt.Errorf("failed to update upload signature: %w", err)
-	}
-
-	return c.JSON(proto.ConfirmUploadResponseV1{
-		URL: fmt.Sprintf("%s/v1/downloads/%s", c.BaseURL(), jwtUUID.String()),
+	err := store.IncrementLimitation(ctx, domain.Limitation{
+		Date:           null.NewAutoDate(w.now()),
+		WrittenBytes:   null.NewAutoInt64(byteSize),
+		WrittenCounter: null.NewAutoInt64(1),
 	})
+	if err != nil {
+		return fmt.Errorf("failed to increment limit: %w", err)
+	}
+
+	return nil
 }

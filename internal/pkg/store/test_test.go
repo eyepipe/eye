@@ -14,22 +14,38 @@ import (
 )
 
 var Seq = sequence.New(time.Now().UnixNano())
-var shards *pool.Pool[*Store]
+var dbPool *pool.Pool[*Store]
 
 func TestMain(m *testing.M) {
-	db, err := Connect("../../../db/db01.sqlite")
-	if err != nil {
-		panic(fmt.Errorf("failed to connect to database: %w", err))
+	paths := []string{
+		"../../../db/databases/db00.sqlite",
+		"../../../db/databases/db01.sqlite",
+		"../../../db/databases/db02.sqlite",
+		"../../../db/databases/db03.sqlite",
+		"../../../db/databases/db04.sqlite",
+		"../../../db/databases/db05.sqlite",
+		"../../../db/databases/db06.sqlite",
+		"../../../db/databases/db07.sqlite",
+		"../../../db/databases/db08.sqlite",
+		"../../../db/databases/db09.sqlite",
+		"../../../db/databases/db10.sqlite",
 	}
 
-	shards = pool.New([]*Store{
-		New(pool.New([]*sql.DB{db})),
-	})
+	stores := make([]*Store, 0, len(paths))
+	for _, path := range paths {
+		db, err := Connect(path)
+		if err != nil {
+			panic(fmt.Errorf("failed to connect to database <%s>: %w", path, err))
+		}
+		stores = append(stores, New(pool.New([]*sql.DB{db})))
+	}
+
+	dbPool = pool.New(stores)
 	os.Exit(m.Run())
 }
 
 func MustWithNew(t *testing.T, cb func(store *Store, ctx context.Context)) {
-	err := shards.GetE(context.Background(), func(store *Store) error {
+	err := dbPool.GetE(context.Background(), func(store *Store) error {
 		cb(store, context.Background())
 		return nil
 	})
@@ -41,6 +57,7 @@ func MustTruncate(t *testing.T, store *Store) {
 	err := withTx(context.Background(), store.pool, func(ctx context.Context, tx *Tx) error {
 		tables := []string{
 			"uploads",
+			"limitations",
 		}
 		for i := range tables {
 			if err := Exec(ctx, tx, Query().Delete(tables[i])); err != nil {

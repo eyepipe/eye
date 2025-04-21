@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"github.com/samber/lo"
 	"io"
 
 	"github.com/eyepipe/eye/internal/pkg/eye_api"
@@ -37,7 +38,7 @@ func (m *Manager) Encrypt(ctx context.Context, reader io.Reader, writer io.Write
 	return sig, nil
 }
 
-func (m *Manager) SendEncrypt(ctx context.Context, reader io.Reader) (out *proto.ConfirmUploadResponseV1, err error) {
+func (m *Manager) SendEncrypt(ctx context.Context, reader io.Reader, contractURL string) (out *proto.ConfirmUploadResponseV1, err error) {
 	pr, pw := io.Pipe()
 	group, gCtx := errgroup.WithContext(ctx)
 	var (
@@ -45,7 +46,7 @@ func (m *Manager) SendEncrypt(ctx context.Context, reader io.Reader) (out *proto
 		sig []byte
 	)
 
-	contract, err := m.contract(ctx)
+	contract, err := m.contract(ctx, contractURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get contract: %w", err)
 	}
@@ -55,7 +56,7 @@ func (m *Manager) SendEncrypt(ctx context.Context, reader io.Reader) (out *proto
 			_ = pr.Close()
 		}()
 
-		res, err = m.upload(gCtx, contract, pr)
+		res, err = m.upload(gCtx, lo.Sample(contract.CreateUploadURLs), pr)
 		switch {
 		case err != nil:
 			return fmt.Errorf("failed to upload: %w", err)
@@ -88,8 +89,8 @@ func (m *Manager) SendEncrypt(ctx context.Context, reader io.Reader) (out *proto
 	}
 
 	// confirm upload
-	// (server validates signature)
-	out, err = m.confirm(ctx, contract, res.Token, sig)
+	// (server validates the signature)
+	out, err = m.confirm(ctx, res.Token, res.ConfirmationURL, sig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to confirm upload: %w", err)
 	}
@@ -97,12 +98,12 @@ func (m *Manager) SendEncrypt(ctx context.Context, reader io.Reader) (out *proto
 	return out, nil
 }
 
-func (m *Manager) contract(ctx context.Context) (*proto.ContractV1, error) {
-	return m.api.GetContract(ctx, "https://api.eyepipe.pw/v1")
+func (m *Manager) contract(ctx context.Context, contractURL string) (*proto.ContractV1, error) {
+	return m.api.GetContract(ctx, contractURL)
 }
 
-func (m *Manager) upload(ctx context.Context, contract *proto.ContractV1, reader io.Reader) (*proto.CreateUploadResponseV1, error) {
-	res, err := m.api.Upload(ctx, contract.CreateUploadURL, reader, eye_api.UploadOpts{
+func (m *Manager) upload(ctx context.Context, uploadURL string, reader io.Reader) (*proto.CreateUploadResponseV1, error) {
+	res, err := m.api.Upload(ctx, uploadURL, reader, eye_api.UploadOpts{
 		SignerAlgo: m.service.GetI().Scheme.SignAlgo.String(),
 	})
 	if err != nil {
@@ -112,13 +113,13 @@ func (m *Manager) upload(ctx context.Context, contract *proto.ContractV1, reader
 	return res, nil
 }
 
-func (m *Manager) confirm(ctx context.Context, contract *proto.ContractV1, token string, sig []byte) (out *proto.ConfirmUploadResponseV1, err error) {
+func (m *Manager) confirm(ctx context.Context, token, confirmationURL string, sig []byte) (out *proto.ConfirmUploadResponseV1, err error) {
 	publicKey, err := export_service.PublicKeyToSPKI(m.service.GetI().SignerPair.Public)
 	if err != nil {
 		return nil, fmt.Errorf("failed to export public key: %w", err)
 	}
 
-	res, err := m.api.Confirm(ctx, contract.ConfirmUploadURL, &proto.ConfirmUploadRequestV1{
+	res, err := m.api.Confirm(ctx, confirmationURL, &proto.ConfirmUploadRequestV1{
 		Token:     token,
 		SigHex:    hex.EncodeToString(sig),
 		PubKeyHex: hex.EncodeToString(publicKey),

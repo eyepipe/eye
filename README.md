@@ -1,11 +1,13 @@
 # eye 🔐 👀
 ## God sees everything, except what's encrypted.
 
+[![Test](https://github.com/eyepipe/eye/actions/workflows/test.yml/badge.svg)](https://github.com/eyepipe/eye/actions/workflows/test.yml)
+
 > [!WARNING]
 > *eye is currently in beta testing mode*.
 
 > [!CAUTION]
-> The current limit for an encrypted message sent to the **cloud** is 4 MiB, 
+> The current limit for an encrypted message sent to the **cloud** is 30 MiB, 
 > with a TTL of 7 days.
 
 Eye is a utility for encrypting and digitally signing **files** and **text** messages.

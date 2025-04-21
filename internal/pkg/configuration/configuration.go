@@ -19,8 +19,12 @@ type Configuration struct {
 	// S3
 	S3ShardDSN []string `yaml:"s3_shard_dsn"`
 
-	// Server
-	ServerBodyLimitMiB int `yaml:"server_body_limit_mb"`
+	// Server limits
+	ServerSingleUploadBytesLimit int64 `yaml:"server_single_upload_bytes_limit"`
+	ServerShardWriteBytesLimit   int64 `yaml:"server_shard_write_bytes_limit"`
+	ServerShardWriteCounterLimit int64 `yaml:"server_shard_write_counter_limit"`
+	ServerShardReadBytesLimit    int64 `yaml:"server_shard_read_bytes_limit"`
+	ServerShardReadCounterLimit  int64 `yaml:"server_shard_read_counter_limit"`
 }
 
 func New() *Configuration {
@@ -36,8 +40,4 @@ func (c *Configuration) BindYAMLFile(filename string) error {
 	}
 
 	return nil
-}
-
-func (c *Configuration) GetServerBodyLimitBytes() int64 {
-	return int64(c.ServerBodyLimitMiB) << 20
 }

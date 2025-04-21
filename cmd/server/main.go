@@ -26,7 +26,7 @@ func main() {
 					FlagAddress,
 				},
 				Action: func(ctx context.Context, c *cli.Command) (err error) {
-					w := new(web.Web)
+					w := web.New()
 					server := NewServer()
 					err = server.config.BindYAMLFile(c.String(FlagConfigRequired.Name))
 					if err != nil {

@@ -81,6 +81,9 @@ func main() {
 				Commands: []*cli.Command{
 					{
 						Name: "send",
+						Flags: []cli.Flag{
+							ContractURLFlag,
+						},
 						Action: func(ctx context.Context, c *cli.Command) (err error) {
 							resolver := input_resolver_service.NewService()
 							i, err := resolver.ResolveContainerReaderOrFileOrUrl(ctx, nil, c.String(IFlag.Name))
@@ -89,7 +92,7 @@ func main() {
 							service := encryption_service.NewService(i, p)
 							manager := encryption_manager.NewManager(service)
 
-							res, err := manager.SendEncrypt(ctx, c.Reader)
+							res, err := manager.SendEncrypt(ctx, c.Reader, c.String(ContractURLFlag.Name))
 							if err != nil {
 								return fmt.Errorf("failed to manager.SendEncrypt: %w", err)
 							}

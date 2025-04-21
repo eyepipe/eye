@@ -2,10 +2,10 @@ package store
 
 import (
 	"context"
-	"github.com/eyepipe/eye/internal/lib/uuidv7"
 	"testing"
 	"time"
 
+	"github.com/eyepipe/eye/internal/lib/uuidv7"
 	"github.com/eyepipe/eye/internal/pkg/domain"
 	"github.com/shlima/oi/null"
 	"github.com/stretchr/testify/require"

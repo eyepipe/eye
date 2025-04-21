@@ -15,11 +15,17 @@ var IFlag = &cli.StringFlag{
 	Usage:     "your private key file (keep it in secret)",
 	TakesFile: true,
 }
+
 var PFlag = &cli.StringFlag{
 	Name:      "p",
 	Aliases:   []string{"participant"},
 	Usage:     "the public key of your counterpart/recipient",
 	TakesFile: true,
+}
+var ContractURLFlag = &cli.StringFlag{
+	Name:    "contract-url",
+	Value:   "https://api.eyepipe.pw/v1",
+	Sources: cli.EnvVars("EYE_CONTRACT_URL"),
 }
 
 var FlagScheme = &cli.StringFlag{

@@ -2,11 +2,12 @@ BUILD_DIR=build
 REGISTRY=ghcr.io/eyepipe/eye
 GIT_COMMIT=$(shell git rev-parse --short HEAD)
 BUILD_TIME=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
-VERSION=0.1.1
+VERSION=0.1.2
 LDFLAGS="-s -w -X github.com/eyepipe/eye/internal/pkg/buildinfo.BuildArgTime=$(BUILD_TIME) -X github.com/eyepipe/eye/internal/pkg/buildinfo.BuildArgGitCommit=$(GIT_COMMIT) -X github.com/eyepipe/eye/internal/pkg/buildinfo.BuildArgVersion=$(VERSION)"
 
 help:
 	@echo 'Available targets:'
+	@echo '  make test'
 	@echo '  make SIZE="1g" randfile'
 	@echo ' '
 	@echo '  make docker-build'
@@ -18,6 +19,9 @@ help:
 	@echo '  make db-down'
 	@echo '  make NAME="create_pages" db-create'
 	@echo ' '
+
+test:
+	go test -count=1 -p 4 -race -cover -covermode atomic ./...
 
 clean:
 	rm -rf ./$(BUILD_DIR)/*

@@ -1,2 +1,2 @@
 # source .profile
-alias eye="go run cmd/cli/*.go"
+alias eye="EYE_CONTRACT_URL=http://localhost:3000/v1 go run cmd/cli/*.go"

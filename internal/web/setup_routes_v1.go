@@ -2,9 +2,9 @@ package web
 
 import (
 	"fmt"
+
 	"github.com/eyepipe/eye/internal/lib/crypto2"
 	"github.com/eyepipe/eye/internal/pkg/container"
-
 	"github.com/eyepipe/eye/pkg/proto"
 	"github.com/gofiber/fiber/v3"
 )
@@ -22,8 +22,7 @@ func (w *Web) SetupRoutesV1(app *fiber.App) {
 		KeyAgreementAlgoURL:  proto.SlugV1KeyAgreement,
 		KeyDerivationAlgoURL: proto.SlugV1KeyDerivation,
 		BlockCipherAlgoURL:   proto.SlugV1BlockCipher,
-		CreateUploadURL:      proto.SlugV1CreateUpload,
-		ConfirmUploadURL:     proto.SlugV1ConfirmUpload,
+		CreateUploadURLs:     []string{proto.SlugV1CreateUpload},
 	}))
 	app.Post(proto.SlugV1CreateUpload, w.CreateUpload)
 	app.Post(proto.SlugV1ConfirmUpload, w.ConfirmUpload)

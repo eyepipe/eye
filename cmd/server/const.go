@@ -1,10 +1,16 @@
 package main
 
-import "github.com/urfave/cli/v3"
+import (
+	"fmt"
+
+	"github.com/eyepipe/eye/internal/pkg/buildinfo"
+	"github.com/urfave/cli/v3"
+)
 
 var FlagConfigRequired = &cli.StringFlag{
 	Name:      "config",
 	Value:     "config/config.yml",
+	Usage:     fmt.Sprintf("https://github.com/eyepipe/eye/blob/%s/config/config.example.yml", buildinfo.BuildArgGitCommit),
 	TakesFile: true,
 }
 
