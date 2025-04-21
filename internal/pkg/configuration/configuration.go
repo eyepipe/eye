@@ -19,6 +19,11 @@ type Configuration struct {
 	// S3
 	S3ShardDSN []string `yaml:"s3_shard_dsn"`
 
+	// ServerBaseURL with scheme and port (if needed)
+	// like "https://api.eyepipe.pw"
+	// by default, eye takes the server base URL from the request headers.
+	ServerBaseURL string `yaml:"server_base_url"`
+
 	// Server limits
 	ServerSingleUploadBytesLimit int64 `yaml:"server_single_upload_bytes_limit"`
 	ServerShardWriteBytesLimit   int64 `yaml:"server_shard_write_bytes_limit"`

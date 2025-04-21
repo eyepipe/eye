@@ -26,3 +26,8 @@ server_shard_write_bytes_limit: 104857600 # 200 << 20
 server_shard_write_counter_limit: 2000
 server_shard_read_bytes_limit: 419430400 # 400 << 20
 server_shard_read_counter_limit: 4000
+  
+# ServerBaseURL with scheme and port (if needed)
+# like "https://api.eyepipe.pw"
+# by default, eye takes the server base URL from the request headers.
+server_base_url:

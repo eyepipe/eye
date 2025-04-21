@@ -24,7 +24,7 @@ import (
 //
 //	curl -X POST -H 'x-signer-algo: ECDSA-P521-SHA512' --data @README.md http://localhost:3000/v1/uploads/create
 func (w *Web) CreateUpload(c fiber.Ctx) error {
-	signAlgo := crypto2.SignerAlgo(c.Get("x-signer-algo"))
+	signAlgo := crypto2.SignerAlgo(c.Get(proto.HeaderSignerAlgo))
 	if !signAlgo.IsValid() {
 		return fmt.Errorf("invalid signing algo: <%s>", signAlgo.String())
 	}
@@ -105,7 +105,7 @@ func (w *Web) CreateUpload(c fiber.Ctx) error {
 	return c.JSON(proto.CreateUploadResponseV1{
 		Token:           token,
 		UploadUUID:      upload.UUID.String,
-		ConfirmationURL: c.BaseURL() + proto.SlugV1ConfirmUpload,
+		ConfirmationURL: w.GetServerBaseURL(c) + proto.SlugV1ConfirmUpload,
 	})
 }
 

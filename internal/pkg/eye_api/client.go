@@ -3,8 +3,9 @@ package eye_api
 import (
 	"context"
 	"fmt"
-	"github.com/eyepipe/eye/pkg/proto"
 	"io"
+
+	"github.com/eyepipe/eye/pkg/proto"
 	"resty.dev/v3"
 )
 

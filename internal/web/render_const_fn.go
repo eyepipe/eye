@@ -13,6 +13,6 @@ func (w *Web) RenderConstJSONFn(obj any) func(c fiber.Ctx) error {
 
 func (w *Web) RenderContractJSONFn(contract proto.ContractV1) func(c fiber.Ctx) error {
 	return func(c fiber.Ctx) error {
-		return c.JSON(contract.WithHost(c.BaseURL()))
+		return c.JSON(contract.WithHost(w.GetServerBaseURL(c)))
 	}
 }

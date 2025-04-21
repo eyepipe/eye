@@ -20,7 +20,8 @@ const (
 
 const (
 	// HeaderSigHex header with digital signature decoded in HEX
-	HeaderSigHex = "x-sig-hex"
+	HeaderSigHex     = "x-sig-hex"
+	HeaderSignerAlgo = "x-signer-algo"
 )
 
 type ContractV1 struct {

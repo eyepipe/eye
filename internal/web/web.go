@@ -53,3 +53,15 @@ func (w *Web) SetApp(c *fiber.App) {
 func (w *Web) SetConfig(config *configuration.Configuration) {
 	w.config = config
 }
+
+// GetServerBaseURL returns URL with server address like:
+// - "http://127.0.0.1:3000"
+// - "https://api.eyepipe.pw"
+func (w *Web) GetServerBaseURL(c fiber.Ctx) string {
+	switch {
+	case len(w.config.ServerBaseURL) != 0:
+		return w.config.ServerBaseURL
+	default:
+		return c.BaseURL()
+	}
+}

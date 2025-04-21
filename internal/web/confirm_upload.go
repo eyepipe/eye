@@ -68,6 +68,6 @@ func (w *Web) ConfirmUpload(c fiber.Ctx) error {
 	}
 
 	return c.JSON(proto.ConfirmUploadResponseV1{
-		URL: fmt.Sprintf("%s/v1/downloads/%s", c.BaseURL(), jwtUUID.String()),
+		URL: fmt.Sprintf("%s/v1/downloads/%s", w.GetServerBaseURL(c), jwtUUID.String()),
 	})
 }
