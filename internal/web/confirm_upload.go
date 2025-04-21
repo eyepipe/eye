@@ -54,12 +54,9 @@ func (w *Web) ConfirmUpload(c fiber.Ctx) error {
 	}
 
 	signer := upload.GetSignerAlgo().ToSigner()
-	valid, err := signer.Verify(serverHash, sig, pubKey)
-	switch {
-	case err != nil:
+	err = signer.Verify(serverHash, sig, pubKey)
+	if err != nil {
 		return fmt.Errorf("failed to verify signature: %w", err)
-	case !valid:
-		return fmt.Errorf("signature is invalid")
 	}
 
 	err = store.UpdateUploadSignatureHex(c.Context(), jwt.UploadUUID, hex.EncodeToString(sig))

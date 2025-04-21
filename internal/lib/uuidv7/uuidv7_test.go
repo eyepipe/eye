@@ -12,9 +12,22 @@ func TestDecode(t *testing.T) {
 
 	// @refs https://www.uuid.lol/uuid/decode
 	t.Run("it works", func(t *testing.T) {
+		t.Parallel()
 		got, err := Decode("061cb26a-54b8-7a52-8000-2124e7041024")
 		require.NoError(t, err)
 		require.Equal(t, time.UnixMilli(6720322163896), got.Time)
+	})
+
+	t.Run("it fails", func(t *testing.T) {
+		t.Parallel()
+		_, err := Decode("061cb26a-54b8-7a52-8000-2124e70410")
+		require.ErrorIs(t, err, ErrDecodeFailed)
+
+		_, err = Decode("doo")
+		require.ErrorIs(t, err, ErrDecodeFailed)
+
+		_, err = Decode("")
+		require.ErrorIs(t, err, ErrDecodeFailed)
 	})
 }
 

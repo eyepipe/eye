@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 
+	"github.com/eyepipe/eye/internal/lib/crypto2"
 	"github.com/eyepipe/eye/internal/pkg/buildinfo"
 	"github.com/eyepipe/eye/internal/pkg/container"
 	"github.com/eyepipe/eye/internal/pkg/services/encryption_manager"
@@ -231,12 +233,12 @@ func main() {
 						return fmt.Errorf("failed to copy: %w", err)
 					}
 
-					ok, err := signer.Verify(hash.Sum(nil), sig, p.SignerPair.Public)
+					err = signer.Verify(hash.Sum(nil), sig, p.SignerPair.Public)
 					switch {
-					case err != nil:
-						return fmt.Errorf("failed to sign: %w", err)
-					case !ok:
+					case errors.Is(err, crypto2.ErrSignatureInvalid):
 						return fmt.Errorf("invalid signature ❌")
+					case err != nil:
+						return fmt.Errorf("failed to verify signature: %w", err)
 					default:
 						_, err = fmt.Fprint(c.Writer, "valid signature ✅\n")
 						return err
@@ -296,35 +298,4 @@ func ImportContainer(ctx context.Context, reader io.Reader, path string) (ct *co
 	}
 
 	return ct, nil
-}
-
-type ReadSignatureOpts struct {
-	Filename string
-	HEX      string
-}
-
-func ReadSignature(ctx context.Context, opts ReadSignatureOpts) (sig []byte, err error) {
-	if len(opts.HEX) != 0 {
-		return hex.DecodeString(opts.HEX)
-	}
-
-	return os.ReadFile(opts.Filename)
-}
-
-func VerifySignature(ctx context.Context, r *container.Container, verification []byte, opts ReadSignatureOpts) (err error) {
-	got, err := ReadSignature(ctx, opts)
-	if err != nil {
-		return fmt.Errorf("failed to read signature: %w", err)
-	}
-
-	signer := r.Scheme.SignAlgo.ToSigner()
-	ok, err := signer.Verify(verification, got, r.SignerPair.Public)
-	switch {
-	case err != nil:
-		return fmt.Errorf("failed to sign: %w", err)
-	case !ok:
-		return fmt.Errorf("signature invalid")
-	default:
-		return nil
-	}
 }

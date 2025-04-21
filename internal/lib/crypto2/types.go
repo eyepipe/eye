@@ -118,7 +118,7 @@ type ISigner interface {
 	Generate() (*KeyPair, error)
 	GetHashier() IHashier
 	Sign(data []byte, private any) ([]byte, error)
-	Verify(data, signature []byte, public any) (bool, error)
+	Verify(data, signature []byte, public any) error
 }
 
 type IKeyAgreement interface {

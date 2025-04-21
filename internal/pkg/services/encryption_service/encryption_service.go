@@ -2,10 +2,11 @@ package encryption_service
 
 import (
 	"fmt"
-	"github.com/eyepipe/eye/internal/lib/crypto2"
-	"github.com/eyepipe/eye/internal/pkg/container"
 	"hash"
 	"io"
+
+	"github.com/eyepipe/eye/internal/lib/crypto2"
+	"github.com/eyepipe/eye/internal/pkg/container"
 )
 
 type Envelope struct {

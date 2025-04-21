@@ -9,6 +9,7 @@ import (
 	"github.com/eyepipe/eye/pkg/proto"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/logger"
+	"github.com/gofiber/fiber/v3/middleware/recover"
 	"github.com/pressly/goose/v3"
 	"github.com/urfave/cli/v3"
 )
@@ -51,8 +52,10 @@ func main() {
 					app := fiber.New(fiber.Config{
 						StreamRequestBody:            true,
 						DisablePreParseMultipartForm: true,
+						ErrorHandler:                 w.ErrorHandler,
 					})
 					app.Use(logger.New())
+					app.Use(recover.New())
 
 					w.SetConfig(server.config)
 					w.SetS3(s3Shards)

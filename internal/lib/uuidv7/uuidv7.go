@@ -23,9 +23,9 @@ func Decode(input string) (*UUIDv7, error) {
 	data, err := hex.DecodeString(cleanUUID)
 	switch {
 	case err != nil:
-		return nil, fmt.Errorf("invalid UUID format: %v", err)
+		return nil, fmt.Errorf("%w: invalid UUID format: %w", ErrDecodeFailed, err)
 	case len(data) != 16:
-		return nil, fmt.Errorf("invalid UUID length: %d", len(data))
+		return nil, fmt.Errorf("%w: invalid UUID length: %d", ErrDecodeFailed, len(data))
 	}
 
 	// first 6 байт — is a timestamp
