@@ -249,7 +249,8 @@ func main() {
 				Name: "hex",
 				Flags: []cli.Flag{
 					&cli.BoolFlag{
-						Name: "dec",
+						Name:    "dec",
+						Aliases: []string{"decode"},
 					},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
