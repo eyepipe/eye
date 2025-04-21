@@ -169,7 +169,7 @@ echo $?
 
 This command will stream-download the message from Bob, decrypt it, and verify its digital signature.
 ```bash
-eye decrypt -i alice.eye -p bob.eye.pub https://api.eyepipe.pw/v1/downloads/0196483c-2f41-7ea2-b0df-1c7cc4cb0000
+eye decrypt -i bob.eye -p alice.eye.pub https://api.eyepipe.pw/v1/downloads/0196483c-2f41-7ea2-b0df-1c7cc4cb0000
 ```
 
 You can also decrypt and verify the signature of a local file.
@@ -246,7 +246,7 @@ To decrypt such a message, it must first be decoded from HEX.
 > There is no need to encode it further into HEX format.
 
 ```bash
-echo -n $HEX | eye hex --dec | eye decrypt -i alice.eye -p bob.eye.pub --sig message.sig
+echo -n $HEX | eye hex --dec | eye decrypt -i bob.eye -p alice.eye.pub --sig message.sig
 ```
 
 ## Feedback
