@@ -49,14 +49,14 @@ func TestCliVerify(t *testing.T) {
 	t.Run("it works from sig file", func(t *testing.T) {
 		t.Parallel()
 		cli, _ := MustSetupCli(t)
-		signed := MustReadAll(t, "testdata/public_super_v1_00")
+		signed := MustReadAll(t, "testdata/super_v1_00.pub")
 
 		stdout := new(strings.Builder)
 		err := cli.
 			WithStdout(stdout).
 			WithStdin(bytes.NewReader(signed)).
 			WithStderr(os.Stderr).
-			Exec("verify", "-p", "testdata/public_super_v1_00", "-sig", "testdata/public_sig_super_v1_00")
+			Exec("verify", "-p", "testdata/super_v1_00.pub", "-sig", "testdata/super_v1_00.pub.sig")
 
 		require.NoError(t, err)
 		require.Contains(t, stdout.String(), ValidSignatureText)
@@ -65,15 +65,15 @@ func TestCliVerify(t *testing.T) {
 	t.Run("it works from sig hex", func(t *testing.T) {
 		t.Parallel()
 		cli, _ := MustSetupCli(t)
-		signed := MustReadAll(t, "testdata/public_super_v1_00")
-		signature := MustReadAll(t, "testdata/public_sig_super_v1_00")
+		signed := MustReadAll(t, "testdata/super_v1_00.pub")
+		signature := MustReadAll(t, "testdata/super_v1_00.pub.sig")
 
 		stdout := new(strings.Builder)
 		err := cli.
 			WithStdout(stdout).
 			WithStdin(bytes.NewReader(signed)).
 			WithStderr(os.Stderr).
-			Exec("verify", "-p", "testdata/public_super_v1_00", "-sig-hex", string(signature))
+			Exec("verify", "-p", "testdata/super_v1_00.pub", "-sig-hex", string(signature))
 
 		require.NoError(t, err)
 		require.Contains(t, stdout.String(), ValidSignatureText)
@@ -82,13 +82,13 @@ func TestCliVerify(t *testing.T) {
 	t.Run("it errors if wrong sig hex", func(t *testing.T) {
 		t.Parallel()
 		cli, _ := MustSetupCli(t)
-		signed := MustReadAll(t, "testdata/public_super_v1_00")
+		signed := MustReadAll(t, "testdata/super_v1_00.pub")
 
 		stderr := new(strings.Builder)
 		err := cli.
 			WithStdin(bytes.NewReader(signed)).
 			WithStderr(stderr).
-			Exec("verify", "-p", "testdata/public_super_v1_00", "-sig-hex", hex.EncodeToString([]byte{1}))
+			Exec("verify", "-p", "testdata/super_v1_00.pub", "-sig-hex", hex.EncodeToString([]byte{1}))
 
 		MustBeAnExistError(t, err)
 		require.Contains(t, stderr.String(), InvalidSignatureText)
@@ -97,13 +97,13 @@ func TestCliVerify(t *testing.T) {
 	t.Run("it errors when sig file not found", func(t *testing.T) {
 		t.Parallel()
 		cli, _ := MustSetupCli(t)
-		signed := MustReadAll(t, "testdata/public_super_v1_00")
+		signed := MustReadAll(t, "testdata/super_v1_00.pub")
 
 		stderr := new(strings.Builder)
 		err := cli.
 			WithStdin(bytes.NewReader(signed)).
 			WithStderr(stderr).
-			Exec("verify", "-p", "testdata/public_super_v1_00", "-sig", "testdata/foo")
+			Exec("verify", "-p", "testdata/super_v1_00.pub", "-sig", "testdata/foo")
 
 		MustBeAnExistError(t, err)
 		require.Contains(t, stderr.String(), "ERR_FILE_FAILED")
