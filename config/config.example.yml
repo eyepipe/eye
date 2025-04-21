@@ -19,4 +19,10 @@ db_shard_files:
 s3_shard_dsn:
   - http://s3.example.com?urn=bucker-provider&region=eu&bucket=bucket&accessKey=secret&secretKey=key
 
-server_body_limit_mb: 4
+# These limits apply to a single database shard.
+# The total limit is calculated as limit × number of shards.
+server_single_upload_bytes_limit: 31457280 # 30 << 20
+server_shard_write_bytes_limit: 104857600 # 200 << 20
+server_shard_write_counter_limit: 2000
+server_shard_read_bytes_limit: 419430400 # 400 << 20
+server_shard_read_counter_limit: 4000
