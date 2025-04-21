@@ -236,9 +236,9 @@ func main() {
 					case err != nil:
 						return fmt.Errorf("failed to sign: %w", err)
 					case !ok:
-						return fmt.Errorf("signature invalid")
+						return fmt.Errorf("invalid signature ❌")
 					default:
-						_, err = c.Writer.Write([]byte("signature valid, ok"))
+						_, err = fmt.Fprint(c.Writer, "valid signature ✅\n")
 						return err
 					}
 				},

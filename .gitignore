@@ -7,6 +7,7 @@
 db/databases/*.sqlite
 bin/*
 build/*
+e2e/testdata/*.bin
 config/config.yml
 !*/.keep
 !repository.eye.pub
